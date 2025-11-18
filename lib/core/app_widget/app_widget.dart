@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pokemon_clean_arch/core/routing/app_router.dart';
 
-// Renomeado para AppWidget
 class AppWidget extends StatelessWidget {
   const AppWidget({super.key});
 
