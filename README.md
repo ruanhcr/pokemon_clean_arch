@@ -1,5 +1,5 @@
 # Pokémon App
-App que demonstra uma arquitetura Enterprise no Flutter, consumindo a PokeAPI para exibir dados de Pokémons. O projeto simula a alta exigência de manutenibilidade e rastreabilidade de código necessárias em aplicações de e-commerce, utilizando o padrão BLoC e Injeção de Dependência em tempo de compilação.
+App que demonstra Clean Architecture no Flutter, consumindo a PokeAPI para exibir dados de Pokémons. O projeto simula a alta exigência de manutenibilidade e rastreabilidade de código necessárias em aplicações de e-commerce, utilizando o padrão BLoC e Injeção de Dependência em tempo de compilação.
 
 # Config
 O projeto utiliza Code Generation para o sistema de Injeção de Dependência (injectable). Para a execução correta, é necessário rodar o build_runner.
