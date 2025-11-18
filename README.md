@@ -30,8 +30,8 @@ Execute o gerador de código no terminal (na raiz do projeto): dart run build_ru
 
 # TO DO
 O projeto atinge seu objetivo arquitetural. Os próximos passos focariam em estabilização e qualidade de código:
-[ ] Testes Unitários de Use Case com mocktail (Conceito pronto, implementação em andamento)
-[ ] Testes de Widget (Golden Tests para UI)
-[ ] Implementação de Cache/Persistência Local para o Catalog (e-commerce real)
-[ ] Implementação de CI/CD Pipeline
-[ ] Adaptação para o padrão White Label (mudar cores/temas dinamicamente)
+- [x] Testes Unitários de Use Case com mocktail (Conceito pronto, implementação em andamento)
+- [x] Testes de Widget (Golden Tests para UI)
+- [x] Implementação de Cache/Persistência Local para o Catalog (e-commerce real)
+- [x] Implementação de CI/CD Pipeline
+- [x] Adaptação para o padrão White Label (mudar cores/temas dinamicamente)
