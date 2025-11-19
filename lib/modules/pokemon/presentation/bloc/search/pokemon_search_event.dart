@@ -1,13 +1,13 @@
 import 'package:equatable/equatable.dart';
 
-sealed class PokemonEvent extends Equatable {
-  const PokemonEvent();
-  
+sealed class PokemonSearchEvent extends Equatable {
+  const PokemonSearchEvent();
+
   @override
   List<Object> get props => [];
 }
 
-class SearchPokemonEvent extends PokemonEvent {
+class SearchPokemonEvent extends PokemonSearchEvent {
   final String name;
 
   const SearchPokemonEvent(this.name);
