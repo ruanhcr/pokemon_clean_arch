@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
-import 'package:pokemon_clean_arch/modules/pokemon/presentation/pages/detail/pokemon_detail_page.dart';
-import 'package:pokemon_clean_arch/modules/pokemon/presentation/pages/list/pokemon_list_page.dart';
-import '../../modules/pokemon/presentation/pages/search/pokemon_search_page.dart';
+import 'package:pokemon_clean_arch/pokemon/presentation/pages/detail/pokemon_detail_page.dart';
+import 'package:pokemon_clean_arch/pokemon/presentation/pages/list/pokemon_list_page.dart';
+import '../../pokemon/presentation/pages/search/pokemon_search_page.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
