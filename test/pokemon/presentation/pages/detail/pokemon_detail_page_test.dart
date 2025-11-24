@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -87,7 +88,10 @@ void main() {
   late MockPokemonDetailBloc detailBloc;
   late MockFavoriteBloc favoriteBloc;
 
-  setUpAll(() {
+  setUpAll(() async {
+    final fontLoader = FontLoader('Poppins');
+    fontLoader.addFont(Future.value(ByteData(0)));
+    await fontLoader.load();
     HttpOverrides.global = MockHttpOverrides();
     GoogleFonts.config.allowRuntimeFetching = false;
     registerFallbackValue(FakeUri());
@@ -101,6 +105,7 @@ void main() {
     when(() => detailBloc.add(any())).thenReturn(null);
 
     when(() => detailBloc.close()).thenAnswer((_) async {});
+    when(() => favoriteBloc.state).thenReturn(FavoriteInitialState());
   });
 
   final tDetail = PokemonDetailEntity(
@@ -156,21 +161,22 @@ void main() {
     expect(find.byType(Image), findsOneWidget);
   });
 
-  testWidgets('Should show Filled Heart icon when Pokemon IS favorite', (tester) async {
+  testWidgets('Should show Filled Heart icon when Pokemon IS favorite', (
+    tester,
+  ) async {
     when(() => detailBloc.state).thenReturn(PokemonDetailSuccessState(tDetail));
-    when(() => favoriteBloc.state).thenReturn(
-      FavoriteLoadedState(favorites: [], favoriteIds: {1}),
-    );
+    when(
+      () => favoriteBloc.state,
+    ).thenReturn(FavoriteLoadedState(favorites: [], favoriteIds: {1}));
 
     // ACT
     await tester.runAsync(() async {
       await tester.pumpWidget(
-        MultiBlocProvider(
-          providers: [
-            BlocProvider<FavoriteBloc>.value(value: favoriteBloc),
-          ],
-          child: MaterialApp(
-            home: PokemonDetailPage(id: 1, bloc: detailBloc),
+        MaterialApp(
+          home: PokemonDetailPage(
+            id: 1,
+            bloc: detailBloc,
+            favoriteBloc: favoriteBloc,
           ),
         ),
       );
@@ -181,21 +187,19 @@ void main() {
     expect(find.byIcon(Icons.favorite_border), findsNothing);
   });
 
-  testWidgets('Should show Border Heart icon when Pokemon is NOT favorite', (tester) async {
+  testWidgets('Should show Border Heart icon when Pokemon is NOT favorite', (
+    tester,
+  ) async {
     when(() => detailBloc.state).thenReturn(PokemonDetailSuccessState(tDetail));
-    when(() => favoriteBloc.state).thenReturn(
-      const FavoriteLoadedState(favorites: [], favoriteIds: {}),
-    );
+    when(
+      () => favoriteBloc.state,
+    ).thenReturn(const FavoriteLoadedState(favorites: [], favoriteIds: {}));
 
     await tester.runAsync(() async {
       await tester.pumpWidget(
         MultiBlocProvider(
-          providers: [
-            BlocProvider<FavoriteBloc>.value(value: favoriteBloc),
-          ],
-          child: MaterialApp(
-            home: PokemonDetailPage(id: 1, bloc: detailBloc),
-          ),
+          providers: [BlocProvider<FavoriteBloc>.value(value: favoriteBloc)],
+          child: MaterialApp(home: PokemonDetailPage(id: 1, bloc: detailBloc)),
         ),
       );
       await tester.pump(const Duration(seconds: 1));

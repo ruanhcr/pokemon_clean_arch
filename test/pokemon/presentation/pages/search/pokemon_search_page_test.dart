@@ -36,6 +36,6 @@ void main() {
 
     expect(find.text('PIKACHU'), findsOneWidget);
     
-    expect(find.text('ID: #001'), findsOneWidget);
+    expect(find.text('#001'), findsOneWidget);
   });
 }

@@ -12,8 +12,14 @@ import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_
 
 class PokemonDetailPage extends StatefulWidget {
   final PokemonDetailBloc? bloc;
+  final FavoriteBloc? favoriteBloc;
   final int id;
-  const PokemonDetailPage({super.key, required this.id, this.bloc});
+  const PokemonDetailPage({
+    super.key,
+    required this.id,
+    this.bloc,
+    this.favoriteBloc,
+  });
 
   @override
   State<PokemonDetailPage> createState() => _PokemonDetailPageState();
@@ -86,7 +92,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         Positioned(
           top: 50,
           right: 16,
-          child: _FavoriteButton(pokemon: pokemon),
+          child: _FavoriteButton(pokemon: pokemon, bloc: widget.favoriteBloc),
         ),
 
         Positioned(
@@ -307,12 +313,14 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
 
 class _FavoriteButton extends StatelessWidget {
   final PokemonDetailEntity pokemon;
+  final FavoriteBloc? bloc;
 
-  const _FavoriteButton({required this.pokemon});
+  const _FavoriteButton({required this.pokemon, this.bloc});
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<FavoriteBloc, FavoriteState>(
+      bloc: bloc,
       builder: (context, state) {
         bool isFavorite = false;
 
@@ -327,7 +335,8 @@ class _FavoriteButton extends StatelessWidget {
             size: 30,
           ),
           onPressed: () {
-            context.read<FavoriteBloc>().add(ToggleFavoriteEvent(pokemon));
+            final effectiveBloc = bloc ?? context.read<FavoriteBloc>();
+            effectiveBloc.add(ToggleFavoriteEvent(pokemon));
           },
         );
       },

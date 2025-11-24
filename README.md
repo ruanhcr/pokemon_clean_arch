@@ -31,6 +31,8 @@ Execute o gerador de código no terminal (na raiz do projeto): dart run build_ru
 - [x] Adição/Subtração de Pokémon Favorito (Cache local)
 - [x] Lista de Favoritos (Cache local)
 
+![Flutter CI](https://github.com/ruanhcr/pokemon_clean_arch/actions/workflows/flutter_ci.yml/badge.svg)
+
 # Screenshots
 <br>![exemplo](https://i.imgur.com/Z3y7HT9.jpeg)
 <br>![exemplo](https://i.imgur.com/Po8sp9r.jpeg)

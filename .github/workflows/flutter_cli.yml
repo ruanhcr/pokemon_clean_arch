@@ -35,7 +35,7 @@ jobs:
         run: flutter analyze
 
       - name: Run Tests
-        run: flutter test --coverage
+        run: flutter test --coverage --no-pub
       
       - name: Dry Run Android Build
         run: flutter build apk --debug
