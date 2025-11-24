@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -39,48 +40,61 @@ class MockHttpHeaders extends Mock implements HttpHeaders {}
 
 class FakeUri extends Fake implements Uri {}
 
+class StreamMockHttpClientResponse extends Mock 
+    with Stream<List<int>> 
+    implements HttpClientResponse {
+  
+  final List<int> data;
+  final Stream<List<int>> _stream;
+
+  StreamMockHttpClientResponse(this.data) 
+      : _stream = Stream.fromIterable([data]);
+
+  @override
+  StreamSubscription<List<int>> listen(
+    void Function(List<int> event)? onData, {
+    Function? onError,
+    void Function()? onDone,
+    bool? cancelOnError,
+  }) {
+    return _stream.listen(
+      onData,
+      onError: onError,
+      onDone: onDone,
+      cancelOnError: cancelOnError,
+    );
+  }
+}
+
 class MockHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     final client = MockHttpClient();
-    final request = MockHttpClientRequest();
-    final response = MockHttpClientResponse();
-    final headers = MockHttpHeaders();
 
-    when(() => client.getUrl(any())).thenAnswer((_) async => request);
     when(() => client.autoUncompress).thenReturn(false);
     when(() => client.autoUncompress = any()).thenReturn(false);
-    when(() => request.headers).thenReturn(headers);
-    when(() => request.close()).thenAnswer((_) async => response);
 
-    when(() => response.statusCode).thenReturn(HttpStatus.ok);
-    when(
-      () => response.compressionState,
-    ).thenReturn(HttpClientResponseCompressionState.notCompressed);
-    when(() => response.contentLength).thenReturn(_transparentImage.length);
+    Future<HttpClientRequest> handleRequest(Invocation invocation) async {
+      final request = MockHttpClientRequest();
+      final headers = MockHttpHeaders();
+      
+      when(() => request.headers).thenReturn(headers);
+      when(() => request.close()).thenAnswer((_) async {
+        final response = StreamMockHttpClientResponse(_transparentImage);
+        
+        when(() => response.statusCode).thenReturn(200);
+        when(() => response.contentLength).thenReturn(_transparentImage.length);
+        when(() => response.compressionState).thenReturn(HttpClientResponseCompressionState.notCompressed);
+        when(() => response.headers).thenReturn(headers);
+        when(() => response.isRedirect).thenReturn(false);
+        
+        return response;
+      });
 
-    when(
-      () => response.listen(
-        any(),
-        onDone: any(named: 'onDone'),
-        onError: any(named: 'onError'),
-        cancelOnError: any(named: 'cancelOnError'),
-      ),
-    ).thenAnswer((invocation) {
-      final onData =
-          invocation.positionalArguments[0] as void Function(List<int>);
-      final onDone = invocation.namedArguments[#onDone] as void Function()?;
-      final onError = invocation.namedArguments[#onError] as Function?;
-      final cancelOnError = invocation.namedArguments[#cancelOnError] as bool?;
+      return request;
+    }
 
-      return Stream<List<int>>.fromIterable([_transparentImage]).listen(
-        onData,
-        onDone: onDone,
-        onError: onError,
-        cancelOnError: cancelOnError,
-      );
-    });
-
+    when(() => client.getUrl(any())).thenAnswer(handleRequest);
     return client;
   }
 }
