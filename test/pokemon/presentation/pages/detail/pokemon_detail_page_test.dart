@@ -78,18 +78,31 @@ class MockHttpOverrides extends HttpOverrides {
       final request = MockHttpClientRequest();
       final headers = MockHttpHeaders();
       
+      Uri uri = invocation.positionalArguments[0] as Uri;
+
+      int statusCode;
+      List<int> responseBytes;
+
+      if (uri.toString().contains('fake.url')) {
+        statusCode = 200;
+        responseBytes = _transparentImage;
+      } else {
+        statusCode = 404;
+        responseBytes = [];
+      }
+      
+      final response = StreamMockHttpClientResponse(responseBytes);
+
       when(() => request.headers).thenReturn(headers);
-      when(() => request.close()).thenAnswer((_) async {
-        final response = StreamMockHttpClientResponse(_transparentImage);
-        
-        when(() => response.statusCode).thenReturn(200);
-        when(() => response.contentLength).thenReturn(_transparentImage.length);
-        when(() => response.compressionState).thenReturn(HttpClientResponseCompressionState.notCompressed);
-        when(() => response.headers).thenReturn(headers);
-        when(() => response.isRedirect).thenReturn(false);
-        
-        return response;
-      });
+      when(() => request.close()).thenAnswer((_) async => response);
+      when(() => request.uri).thenReturn(uri);
+      
+      when(() => response.statusCode).thenReturn(statusCode);
+      when(() => response.contentLength).thenReturn(responseBytes.length);
+      when(() => response.compressionState).thenReturn(HttpClientResponseCompressionState.notCompressed);
+      when(() => response.headers).thenReturn(headers);
+      when(() => response.isRedirect).thenReturn(false); 
+      when(() => response.reasonPhrase).thenReturn(statusCode == 200 ? "OK" : "Not Found");
 
       return request;
     }
@@ -202,19 +215,24 @@ void main() {
       () => favoriteBloc.state,
     ).thenReturn(FavoriteLoadedState(favorites: [], favoriteIds: {1}));
 
-    await tester.pumpWidget(
-      MultiBlocProvider(
-        providers: [BlocProvider<FavoriteBloc>.value(value: favoriteBloc)],
-        child: MaterialApp(
-          home: PokemonDetailPage(
-            id: 1,
-            bloc: detailBloc,
-            favoriteBloc: favoriteBloc,
+    await tester.runAsync(() async {
+      await tester.pumpWidget(
+        MultiBlocProvider(
+          providers: [
+            BlocProvider<FavoriteBloc>.value(value: favoriteBloc),
+          ],
+          child: MaterialApp(
+            home: PokemonDetailPage(
+              id: 1, 
+              bloc: detailBloc,
+              favoriteBloc: favoriteBloc,
+            ),
           ),
         ),
-      ),
-    );
-    await tester.pump();
+      );
+      
+      await tester.pump();
+    });
 
     expect(find.byIcon(Icons.favorite), findsOneWidget);
     expect(find.byIcon(Icons.favorite_border), findsNothing);
