@@ -7,4 +7,9 @@ abstract class IPokemonRepository {
   Future<Either<Failure, PokemonEntity>> searchPokemon(String name);
   Future<Either<Failure, PokemonDetailEntity>> getPokemonDetail(int id);
   Future<Either<Failure, List<PokemonEntity>>> getPokemonList({int offset = 0});
+
+  Future<Either<Failure, void>> saveFavorite(PokemonEntity pokemon);
+  Future<Either<Failure, void>> removeFavorite(int id);
+  Future<Either<Failure, bool>> isFavorite(int id);
+  Future<Either<Failure, List<PokemonEntity>>> getFavorites();
 }

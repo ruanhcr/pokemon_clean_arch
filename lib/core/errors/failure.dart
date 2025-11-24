@@ -27,3 +27,7 @@ class InvalidInputFailure extends Failure {
 class EmptyInputFailure extends Failure {
   EmptyInputFailure(super.message);
 }
+
+class CacheFailure extends Failure {
+  CacheFailure([super.message = 'Erro ao acessar dados locais.']);
+}

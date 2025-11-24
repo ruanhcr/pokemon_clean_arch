@@ -9,6 +9,7 @@ extension FailureMessage on Failure {
       NotFoundFailure() => 'Ops! Não encontramos nenhum Pokémon com esse nome.',
       InvalidInputFailure() => 'Ops! Parece que o ID do Pokémon é inválido',
       EmptyInputFailure() => 'O nome do Pokémon não pode ser vazio',
+      CacheFailure() => 'Erro ao acessar favoritos',
     };
   }
 }

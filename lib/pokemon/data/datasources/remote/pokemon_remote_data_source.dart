@@ -1,13 +1,13 @@
 import 'package:injectable/injectable.dart';
 import 'package:pokemon_clean_arch/core/api/endpoints.dart';
 import 'package:pokemon_clean_arch/core/network/rest_client/rest_client.dart';
-import 'package:pokemon_clean_arch/pokemon/data/datasources/i_pokemon_data_source.dart';
+import 'package:pokemon_clean_arch/pokemon/data/datasources/remote/i_pokemon_remote_data_source.dart';
 
-@Injectable(as: IPokemonDataSource)
-class PokemonDataSource implements IPokemonDataSource {
+@Injectable(as: IPokemonRemoteDataSource)
+class PokemonRemoteDataSource implements IPokemonRemoteDataSource {
   final RestClient client;
 
-  PokemonDataSource(this.client);
+  PokemonRemoteDataSource(this.client);
 
   @override
   Future<Map<String, dynamic>> searchPokemon(String name) async {

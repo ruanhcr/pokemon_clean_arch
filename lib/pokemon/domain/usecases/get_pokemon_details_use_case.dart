@@ -8,8 +8,9 @@ import 'i_get_pokemon_details_use_case.dart';
 
 @Injectable(as: IGetPokemonDetailsUseCase)
 class GetPokemonDetailsUseCase implements IGetPokemonDetailsUseCase {
-  final IPokemonRepository repository;
-  GetPokemonDetailsUseCase(this.repository);
+  final IPokemonRepository _repository;
+  GetPokemonDetailsUseCase({required IPokemonRepository repository})
+    : _repository = repository;
 
   @override
   Future<Either<Failure, PokemonDetailEntity>> call(int id) async {
@@ -21,6 +22,6 @@ class GetPokemonDetailsUseCase implements IGetPokemonDetailsUseCase {
       );
     }
 
-    return await repository.getPokemonDetail(id);
+    return await _repository.getPokemonDetail(id);
   }
 }

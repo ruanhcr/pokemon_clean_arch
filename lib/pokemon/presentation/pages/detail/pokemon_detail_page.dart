@@ -6,6 +6,9 @@ import 'package:pokemon_clean_arch/pokemon/domain/entities/pokemon_detail_entity
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/detail/pokemon_detail_bloc.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/detail/pokemon_detail_event.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/detail/pokemon_detail_state.dart';
+import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_bloc.dart';
+import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_event.dart';
+import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_state.dart';
 
 class PokemonDetailPage extends StatefulWidget {
   final PokemonDetailBloc? bloc;
@@ -78,6 +81,12 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
             icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
+        ),
+
+        Positioned(
+          top: 50,
+          right: 16,
+          child: _FavoriteButton(pokemon: pokemon),
         ),
 
         Positioned(
@@ -293,5 +302,35 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       default:
         return const Color(0xFFA8A77A);
     }
+  }
+}
+
+class _FavoriteButton extends StatelessWidget {
+  final PokemonDetailEntity pokemon;
+
+  const _FavoriteButton({required this.pokemon});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<FavoriteBloc, FavoriteState>(
+      builder: (context, state) {
+        bool isFavorite = false;
+
+        if (state is FavoriteLoadedState) {
+          isFavorite = state.isFavorite(pokemon.id);
+        }
+
+        return IconButton(
+          icon: Icon(
+            isFavorite ? Icons.favorite : Icons.favorite_border,
+            color: Colors.white,
+            size: 30,
+          ),
+          onPressed: () {
+            context.read<FavoriteBloc>().add(ToggleFavoriteEvent(pokemon));
+          },
+        );
+      },
+    );
   }
 }

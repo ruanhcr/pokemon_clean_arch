@@ -14,7 +14,7 @@ void main() {
 
   setUp(() {
     repository = MockPokemonRepository();
-    useCase = SearchPokemonUseCase(repository);
+    useCase = SearchPokemonUseCase(repository: repository);
   });
 
   final tPokemon = PokemonEntity(id: 1, name: 'pikachu', imageUrl: 'url');

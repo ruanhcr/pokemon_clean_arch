@@ -13,7 +13,7 @@ void main() {
 
   setUp(() {
     repository = MockPokemonRepository();
-    useCase = GetPokemonListUseCase(repository);
+    useCase = GetPokemonListUseCase(repository: repository);
   });
 
   final tPokemonList = [

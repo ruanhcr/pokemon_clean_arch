@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data'; // Import necessário para ByteData
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Import necessário para FontLoader

@@ -7,9 +7,9 @@ import 'package:pokemon_clean_arch/pokemon/domain/usecases/i_get_pokemon_list_us
 
 @Injectable(as: IGetPokemonListUseCase)
 class GetPokemonListUseCase implements IGetPokemonListUseCase {
-  final IPokemonRepository repository;
-
-  const GetPokemonListUseCase(this.repository);
+  final IPokemonRepository _repository;
+  GetPokemonListUseCase({required IPokemonRepository repository})
+    : _repository = repository;
 
   @override
   Future<Either<Failure, List<PokemonEntity>>> call({
@@ -21,6 +21,6 @@ class GetPokemonListUseCase implements IGetPokemonListUseCase {
         DataParsingFailure('Offset inválido: não pode ser negativo.'),
       );
     }
-    return await repository.getPokemonList(offset: offset ?? 0);
+    return await _repository.getPokemonList(offset: offset ?? 0);
   }
 }

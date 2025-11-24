@@ -1,4 +1,4 @@
-abstract interface class IPokemonDataSource {
+abstract interface class IPokemonRemoteDataSource {
   Future<Map<String, dynamic>> searchPokemon(String name);
   Future<Map<String, dynamic>> getPokemonDetailById(int id);
   Future<List<Map<String, dynamic>>> getPokemonList({

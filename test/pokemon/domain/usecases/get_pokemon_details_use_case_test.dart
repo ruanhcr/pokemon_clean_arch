@@ -13,7 +13,7 @@ void main() {
 
   setUp(() {
     repository = MockPokemonRepository();
-    useCase = GetPokemonDetailsUseCase(repository);
+    useCase = GetPokemonDetailsUseCase(repository: repository);
   });
 
   final tPokemonDetails = PokemonDetailEntity(
