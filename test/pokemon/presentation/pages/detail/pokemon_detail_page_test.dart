@@ -100,7 +100,7 @@ class MockHttpOverrides extends HttpOverrides {
         statusCode = 200;
         responseBytes = _transparentImage;
       } else {
-        statusCode = 404;
+        statusCode = 200;
         responseBytes = [];
       }
 
