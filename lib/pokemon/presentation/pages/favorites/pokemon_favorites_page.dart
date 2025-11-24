@@ -7,13 +7,25 @@ import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_state.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/widgets/pokemon_card.dart';
 
-class PokemonFavoritesPage extends StatelessWidget {
-  const PokemonFavoritesPage({super.key});
+class PokemonFavoritesPage extends StatefulWidget {
+  final FavoriteBloc? bloc;
+  const PokemonFavoritesPage({super.key, this.bloc});
+
+  @override
+  State<PokemonFavoritesPage> createState() => _PokemonFavoritesPageState();
+}
+
+class _PokemonFavoritesPageState extends State<PokemonFavoritesPage> {
+  late final FavoriteBloc bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    bloc = widget.bloc ?? GetIt.I.get<FavoriteBloc>();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final favoriteBloc = GetIt.I.get<FavoriteBloc>();
-
     return Scaffold(
       backgroundColor: const Color(0xFF212121),
       body: Container(
@@ -44,7 +56,7 @@ class PokemonFavoritesPage extends StatelessWidget {
             ),
 
             BlocBuilder<FavoriteBloc, FavoriteState>(
-              bloc: favoriteBloc,
+              bloc: bloc,
               builder: (context, state) {
                 if (state is! FavoriteLoadedState || state.favorites.isEmpty) {
                   return SliverFillRemaining(
@@ -78,7 +90,10 @@ class PokemonFavoritesPage extends StatelessWidget {
                         ),
                     delegate: SliverChildBuilderDelegate((context, index) {
                       final pokemon = state.favorites[index];
-                      return PokemonCard(pokemon: pokemon, showFavoriteButton: true,);
+                      return PokemonCard(
+                        pokemon: pokemon,
+                        showFavoriteButton: true,
+                      );
                     }, childCount: state.favorites.length),
                   ),
                 );

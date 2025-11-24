@@ -21,17 +21,20 @@ Execute o gerador de código no terminal (na raiz do projeto): dart run build_ru
 - [x] [Go Router](https://pub.dev/packages/go_router)
 - [x] [Dio](https://pub.dev/packages/dio)
 - [x] [Equatable](https://pub.dev/packages/equatable)
+- [x] [fpdart](https://pub.dev/packages/fpdart)
+- [x] [Hive](https://pub.dev/packages/hive)
 
 # Features
+- [x] Lista de Pokémon (consumo de API)
 - [x] Busca de Pokémon (consumo de API)
+- [x] Detalhes de Pokémon (consumo de API)
+- [x] Adição/Subtração de Pokémon Favorito (Cache local)
+- [x] Lista de Favoritos (Cache local)
 
-# Screenshot
-<br>![exemplo](https://i.imgur.com/zJIGo3l.png)
+# Screenshots
+<br>![exemplo](https://i.imgur.com/Z3y7HT9.jpeg)
+<br>![exemplo](https://i.imgur.com/Po8sp9r.jpeg)
+<br>![exemplo](https://i.imgur.com/11UwRIH.jpeg)
+<br>![exemplo](https://i.imgur.com/nXBeiUf.png)
+<br>![exemplo](https://i.imgur.com/UcTeCe3.png)
 
-# TO DO
-O projeto atinge seu objetivo arquitetural. Os próximos passos focariam em estabilização e qualidade de código:
-- [x] Testes Unitários de Use Case com mocktail (Conceito pronto, implementação em andamento)
-- [x] Testes de Widget (Golden Tests para UI)
-- [x] Implementação de Cache/Persistência Local para o Catalog (e-commerce real)
-- [x] Implementação de CI/CD Pipeline
-- [x] Adaptação para o padrão White Label (mudar cores/temas dinamicamente)

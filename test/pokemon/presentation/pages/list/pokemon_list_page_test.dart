@@ -4,15 +4,23 @@ import 'dart:io';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:pokemon_clean_arch/pokemon/domain/entities/pokemon_entity.dart';
+import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_bloc.dart';
+import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_event.dart';
+import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_state.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/list/pokemon_list_bloc.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/list/pokemon_list_event.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/list/pokemon_list_state.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/pages/list/pokemon_list_page.dart';
+import 'package:pokemon_clean_arch/pokemon/presentation/widgets/pokemon_grid_skeleton.dart';
 
 class MockPokemonListBloc extends MockBloc<PokemonListEvent, PokemonListState>
     implements PokemonListBloc {}
+
+class MockFavoriteBloc extends MockBloc<FavoriteEvent, FavoriteState> 
+    implements FavoriteBloc {}
 
 final _transparentImage = base64Decode(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==',
@@ -49,15 +57,24 @@ class MockHttpOverrides extends HttpOverrides {
 }
 
 void main() {
-  late MockPokemonListBloc bloc;
+  late MockPokemonListBloc listBloc;
+  late MockFavoriteBloc favoriteBloc;
 
   setUpAll(() { 
     HttpOverrides.global = MockHttpOverrides();
   });
 
   setUp(() {
-    bloc = MockPokemonListBloc();
-    when(() => bloc.close()).thenAnswer((_) async {});
+    listBloc = MockPokemonListBloc();
+    favoriteBloc = MockFavoriteBloc();
+
+    GetIt.I.reset();
+    
+    GetIt.I.registerSingleton<PokemonListBloc>(listBloc);
+    GetIt.I.registerSingleton<FavoriteBloc>(favoriteBloc);
+
+    when(() => favoriteBloc.state).thenReturn(FavoriteInitialState());
+    when(() => listBloc.close()).thenAnswer((_) async {});
   });
 
   final tPokemon = PokemonEntity(
@@ -69,31 +86,31 @@ void main() {
   testWidgets('Should display Loading Indicator when state is Loading', (
     tester,
   ) async {
-    when(() => bloc.state).thenReturn(PokemonListLoadingState());
+    when(() => listBloc.state).thenReturn(PokemonListLoadingState());
 
-    await tester.pumpWidget(MaterialApp(home: PokemonListPage(bloc: bloc,)));
+    await tester.pumpWidget(MaterialApp(home: PokemonListPage(bloc: listBloc,)));
 
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.byType(PokemonGridSkeleton), findsOneWidget);
   });
 
   testWidgets('Should display Error Message when state is Error', (
     tester,
   ) async {
     const msg = 'Erro de conexão';
-    when(() => bloc.state).thenReturn(const PokemonListErrorState(msg));
+    when(() => listBloc.state).thenReturn(const PokemonListErrorState(msg));
 
-    await tester.pumpWidget(MaterialApp(home: PokemonListPage(bloc: bloc,)));
+    await tester.pumpWidget(MaterialApp(home: PokemonListPage(bloc: listBloc,)));
 
     expect(find.text(msg), findsOneWidget);
   });
 
 testWidgets('Should display Pokemon Grid when state is Success', (tester) async {
-    when(() => bloc.state).thenReturn(
+    when(() => listBloc.state).thenReturn(
       PokemonListSuccessState(pokemons: [tPokemon], hasReachedMax: true),
     );
 
     await tester.pumpWidget(MaterialApp(
-      home: PokemonListPage(bloc: bloc),
+      home: PokemonListPage(bloc: listBloc),
     ));
     await tester.pump(); 
 
