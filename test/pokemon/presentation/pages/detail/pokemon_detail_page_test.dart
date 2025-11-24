@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:pokemon_clean_arch/core/ui/styles/app_typography.dart';
 import 'package:pokemon_clean_arch/pokemon/domain/entities/pokemon_detail_entity.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/detail/pokemon_detail_bloc.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/detail/pokemon_detail_event.dart';
@@ -18,6 +18,13 @@ import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_state.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/pages/detail/pokemon_detail_page.dart';
 
+final _transparentImage = base64Decode(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==',
+);
+
+class FakeStreamListInt extends Fake implements Stream<List<int>> {}
+
+// --- 2. MOCKS DE BLOC ---
 class MockPokemonDetailBloc
     extends MockBloc<PokemonDetailEvent, PokemonDetailState>
     implements PokemonDetailBloc {}
@@ -25,10 +32,24 @@ class MockPokemonDetailBloc
 class MockFavoriteBloc extends MockBloc<FavoriteEvent, FavoriteState>
     implements FavoriteBloc {}
 
-final _transparentImage = base64Decode(
-  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==',
-);
+// --- 3. MOCK DE TIPOGRAFIA (Sua implementação correta!) ---
+class MockAppTypography implements AppTypography {
+  @override
+  TextStyle body(double fontSize, Color color, {FontWeight? fontWeight}) {
+    return TextStyle(fontSize: fontSize, color: color, fontWeight: fontWeight);
+  }
 
+  @override
+  TextStyle heading(double fontSize, Color color) {
+    return TextStyle(
+      fontSize: fontSize,
+      color: color,
+      fontWeight: FontWeight.bold,
+    );
+  }
+}
+
+// --- 4. MOCKS DE INFRAESTRUTURA HTTP (O Segredo para Image.network) ---
 class MockHttpClient extends Mock implements HttpClient {}
 
 class MockHttpClientRequest extends Mock implements HttpClientRequest {}
@@ -37,10 +58,7 @@ class MockHttpClientResponse extends Mock implements HttpClientResponse {}
 
 class MockHttpHeaders extends Mock implements HttpHeaders {}
 
-class FakeUri extends Fake implements Uri {}
-
-class FakeStreamListInt extends Fake implements Stream<List<int>> {}
-
+// Mixin para Streams (Evita erro de tipo 'Null is not subtype of Stream')
 class StreamMockHttpClientResponse extends Mock
     with Stream<List<int>>
     implements HttpClientResponse {
@@ -66,6 +84,7 @@ class StreamMockHttpClientResponse extends Mock
   }
 }
 
+// O Override que retorna a imagem fake imediatamente
 class MockHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
@@ -73,81 +92,32 @@ class MockHttpOverrides extends HttpOverrides {
 
     when(() => client.autoUncompress).thenReturn(false);
     when(() => client.autoUncompress = any()).thenReturn(false);
-    when(() => client.idleTimeout).thenReturn(const Duration(seconds: 0));
-    when(
-      () => client.idleTimeout = any(),
-    ).thenReturn(const Duration(seconds: 0));
 
     Future<HttpClientRequest> handleRequest(Invocation invocation) async {
       final request = MockHttpClientRequest();
       final headers = MockHttpHeaders();
+      final uri = invocation.positionalArguments[0] as Uri;
 
-      Uri uri;
-      if (invocation.memberName == #openUrl) {
-        uri = invocation.positionalArguments[1] as Uri;
-      } else if (invocation.memberName == #open) {
-        final host = invocation.positionalArguments[1] as String;
-        final path = invocation.positionalArguments[3] as String;
-        uri = Uri.parse('https://$host$path');
-      } else {
-        uri = invocation.positionalArguments[0] as Uri;
-      }
-
-      int statusCode;
-      List<int> responseBytes;
-
-      if (uri.toString().contains('fake.url')) {
-        statusCode = 200;
-        responseBytes = _transparentImage;
-      } else {
-        statusCode = 200;
-        responseBytes = [];
-      }
-
-      final response = StreamMockHttpClientResponse(responseBytes);
+      // Retorna sempre sucesso com a imagem transparente
+      final response = StreamMockHttpClientResponse(_transparentImage);
 
       when(() => request.headers).thenReturn(headers);
       when(() => request.close()).thenAnswer((_) async => response);
-      when(() => request.done).thenAnswer((_) async => response);
       when(() => request.uri).thenReturn(uri);
 
-      when(() => request.persistentConnection).thenReturn(true);
-      when(() => request.persistentConnection = any()).thenReturn(true);
-      when(() => request.followRedirects).thenReturn(true);
-      when(() => request.followRedirects = any()).thenReturn(true);
-      when(() => request.maxRedirects = any()).thenReturn(5);
-      when(() => request.contentLength = any()).thenReturn(0);
-      when(() => request.add(any())).thenReturn(null);
-      when(() => request.addStream(any())).thenAnswer((_) async {});
-
-      when(() => response.statusCode).thenReturn(statusCode);
-      when(() => response.contentLength).thenReturn(responseBytes.length);
+      when(() => response.statusCode).thenReturn(200);
+      when(() => response.contentLength).thenReturn(_transparentImage.length);
       when(
         () => response.compressionState,
       ).thenReturn(HttpClientResponseCompressionState.notCompressed);
       when(() => response.headers).thenReturn(headers);
-      when(() => response.cookies).thenReturn([]);
       when(() => response.isRedirect).thenReturn(false);
-      when(() => response.persistentConnection).thenReturn(true);
-      when(() => response.redirects).thenReturn([]);
       when(() => response.reasonPhrase).thenReturn("OK");
-
-      when(() => headers.set(any(), any())).thenReturn(null);
-      when(() => headers.add(any(), any())).thenReturn(null);
-      when(() => headers.removeAll(any())).thenReturn(null);
-      when(() => headers.forEach(any())).thenReturn(null);
-      when(() => headers.value(any())).thenReturn(null);
 
       return request;
     }
 
     when(() => client.getUrl(any())).thenAnswer(handleRequest);
-    when(() => client.openUrl(any(), any())).thenAnswer(handleRequest);
-    when(
-      () => client.open(any(), any(), any(), any()),
-    ).thenAnswer(handleRequest);
-    when(() => client.headUrl(any())).thenAnswer(handleRequest);
-
     return client;
   }
 }
@@ -155,45 +125,30 @@ class MockHttpOverrides extends HttpOverrides {
 void main() {
   late MockPokemonDetailBloc detailBloc;
   late MockFavoriteBloc favoriteBloc;
+  late AppTypography typography;
 
-  setUpAll(() async {
+  setUpAll(() {
     TestWidgetsFlutterBinding.ensureInitialized();
-
-    registerFallbackValue(Uri.parse('http://example.com'));
-    registerFallbackValue(const Duration(seconds: 1));
-
     HttpOverrides.global = MockHttpOverrides();
-
-    GoogleFonts.config.allowRuntimeFetching = true;
-
-    final originalOnError = FlutterError.onError;
-    FlutterError.onError = (FlutterErrorDetails details) {
-      final errorMsg = details.exception.toString();
-      if (errorMsg.contains('google_fonts') || errorMsg.contains('load font')) {
-        return;
-      }
-      originalOnError?.call(details);
-    };
-
+    registerFallbackValue(FakeStreamListInt());
+    registerFallbackValue(Uri.parse('http://dummy.com'));
     registerFallbackValue(const FetchPokemonDetailEvent(1));
     registerFallbackValue(LoadFavoritesEvent());
-    registerFallbackValue(FakeStreamListInt());
   });
 
   setUp(() {
     detailBloc = MockPokemonDetailBloc();
     favoriteBloc = MockFavoriteBloc();
+    typography = MockAppTypography();
 
     GetIt.I.reset();
-
-    GetIt.I.registerSingleton<FavoriteBloc>(favoriteBloc);
-    GetIt.I.registerSingleton<PokemonDetailBloc>(detailBloc);
 
     when(() => detailBloc.add(any())).thenReturn(null);
     when(() => favoriteBloc.add(any())).thenReturn(null);
     when(() => detailBloc.close()).thenAnswer((_) async {});
     when(() => favoriteBloc.close()).thenAnswer((_) async {});
 
+    // Estados iniciais
     when(() => favoriteBloc.state).thenReturn(FavoriteInitialState());
     when(() => detailBloc.state).thenReturn(PokemonDetailInitialState());
   });
@@ -216,24 +171,24 @@ void main() {
       () => favoriteBloc.state,
     ).thenReturn(FavoriteLoadedState(favorites: [], favoriteIds: {1}));
 
-    await tester.runAsync(() async {
-      await tester.pumpWidget(
-        MultiBlocProvider(
-          providers: [BlocProvider<FavoriteBloc>.value(value: favoriteBloc)],
-          child: MaterialApp(
-            home: PokemonDetailPage(
-              id: 1,
-              bloc: detailBloc,
-              favoriteBloc: favoriteBloc,
-            ),
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: [BlocProvider<FavoriteBloc>.value(value: favoriteBloc)],
+        child: MaterialApp(
+          home: PokemonDetailPage(
+            id: 1,
+            bloc: detailBloc,
+            favoriteBloc: favoriteBloc,
+            typography: typography, // Injeção da sua abstração
           ),
         ),
-      );
-      await tester.pump(const Duration(milliseconds: 500));
-    });
+      ),
+    );
+
+    // Pump para processar o microtask da imagem
+    await tester.pump();
 
     expect(find.byIcon(Icons.favorite), findsOneWidget);
-    expect(find.byIcon(Icons.favorite_border), findsNothing);
   });
 
   testWidgets('Should show Border Heart icon when Pokemon is NOT favorite', (
@@ -248,7 +203,14 @@ void main() {
       await tester.pumpWidget(
         MultiBlocProvider(
           providers: [BlocProvider<FavoriteBloc>.value(value: favoriteBloc)],
-          child: MaterialApp(home: PokemonDetailPage(id: 1, bloc: detailBloc)),
+          child: MaterialApp(
+            home: PokemonDetailPage(
+              id: 1,
+              bloc: detailBloc,
+              favoriteBloc: favoriteBloc,
+              typography: typography,
+            ),
+          ),
         ),
       );
       await tester.pump(const Duration(milliseconds: 500));

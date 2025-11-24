@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:pokemon_clean_arch/core/ui/styles/app_typography.dart';
 import 'package:pokemon_clean_arch/pokemon/domain/entities/pokemon_detail_entity.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/detail/pokemon_detail_bloc.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/detail/pokemon_detail_event.dart';
@@ -13,12 +13,14 @@ import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_
 class PokemonDetailPage extends StatefulWidget {
   final PokemonDetailBloc? bloc;
   final FavoriteBloc? favoriteBloc;
+  final AppTypography? typography;
   final int id;
   const PokemonDetailPage({
     super.key,
     required this.id,
     this.bloc,
     this.favoriteBloc,
+    this.typography,
   });
 
   @override
@@ -27,11 +29,13 @@ class PokemonDetailPage extends StatefulWidget {
 
 class _PokemonDetailPageState extends State<PokemonDetailPage> {
   late final PokemonDetailBloc bloc;
+  late final AppTypography typography;
 
   @override
   void initState() {
     super.initState();
     bloc = widget.bloc ?? GetIt.I.get<PokemonDetailBloc>();
+    typography = widget.typography ?? GetIt.I.get<AppTypography>();
     bloc.add(FetchPokemonDetailEvent(widget.id));
   }
 
@@ -103,11 +107,9 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
             children: [
               Text(
                 pokemon.name.toUpperCase(),
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: typography
+                    .heading(36, Colors.white)
+                    .copyWith(fontWeight: FontWeight.bold),
               ),
               Row(
                 children: pokemon.types
@@ -142,11 +144,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
           right: 24,
           child: Text(
             "#${pokemon.id.toString().padLeft(3, '0')}",
-            style: GoogleFonts.poppins(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+            style: typography.body(14, Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
 
@@ -184,10 +182,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
 
                     Text(
                       "Base Stats",
-                      style: GoogleFonts.poppins(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: typography.body(20, Colors.black, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 16),
                     _buildStatRow("HP", pokemon.stats['hp'] ?? 0, Colors.red),
