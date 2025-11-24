@@ -16,7 +16,7 @@ import 'package:injectable/injectable.dart' as _i526;
 
 import '../../pokemon/data/datasources/local/i_pokemon_local_data_source.dart'
     as _i234;
-import '../../pokemon/data/datasources/local/pokemon_local_data_source.dart'
+import '../../pokemon/data/datasources/local/pokemon_local_data_source_impl.dart'
     as _i1036;
 import '../../pokemon/data/datasources/remote/i_pokemon_remote_data_source.dart'
     as _i752;
