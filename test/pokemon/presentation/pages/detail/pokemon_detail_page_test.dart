@@ -4,8 +4,8 @@ import 'dart:io';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:pokemon_clean_arch/pokemon/domain/entities/pokemon_detail_entity.dart';
@@ -89,23 +89,33 @@ void main() {
   late MockFavoriteBloc favoriteBloc;
 
   setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+
     final fontLoader = FontLoader('Poppins');
     fontLoader.addFont(Future.value(ByteData(0)));
     await fontLoader.load();
+
+    final fontLoader2 = FontLoader('PressStart2P');
+    fontLoader2.addFont(Future.value(ByteData(0)));
+    await fontLoader2.load();
+
     HttpOverrides.global = MockHttpOverrides();
     GoogleFonts.config.allowRuntimeFetching = false;
     registerFallbackValue(FakeUri());
     registerFallbackValue(const FetchPokemonDetailEvent(1));
+    registerFallbackValue(LoadFavoritesEvent());
   });
 
   setUp(() {
     detailBloc = MockPokemonDetailBloc();
     favoriteBloc = MockFavoriteBloc();
 
-    when(() => detailBloc.add(any())).thenReturn(null);
+    GetIt.I.reset();
 
+    when(() => detailBloc.add(any())).thenReturn(null);
+    when(() => favoriteBloc.add(any())).thenReturn(null);
     when(() => detailBloc.close()).thenAnswer((_) async {});
-    when(() => favoriteBloc.state).thenReturn(FavoriteInitialState());
+    when(() => favoriteBloc.close()).thenAnswer((_) async {});
   });
 
   final tDetail = PokemonDetailEntity(
@@ -149,7 +159,13 @@ void main() {
     when(() => detailBloc.state).thenReturn(PokemonDetailSuccessState(tDetail));
     await tester.runAsync(() async {
       await tester.pumpWidget(
-        MaterialApp(home: PokemonDetailPage(id: 1, bloc: detailBloc)),
+        MaterialApp(
+          home: PokemonDetailPage(
+            id: 1,
+            bloc: detailBloc,
+            favoriteBloc: favoriteBloc,
+          ),
+        ),
       );
       await tester.pump(const Duration(seconds: 1));
     });
@@ -169,7 +185,6 @@ void main() {
       () => favoriteBloc.state,
     ).thenReturn(FavoriteLoadedState(favorites: [], favoriteIds: {1}));
 
-    // ACT
     await tester.runAsync(() async {
       await tester.pumpWidget(
         MaterialApp(
@@ -197,9 +212,12 @@ void main() {
 
     await tester.runAsync(() async {
       await tester.pumpWidget(
-        MultiBlocProvider(
-          providers: [BlocProvider<FavoriteBloc>.value(value: favoriteBloc)],
-          child: MaterialApp(home: PokemonDetailPage(id: 1, bloc: detailBloc)),
+        MaterialApp(
+          home: PokemonDetailPage(
+            id: 1,
+            bloc: detailBloc,
+            favoriteBloc: favoriteBloc,
+          ),
         ),
       );
       await tester.pump(const Duration(seconds: 1));
