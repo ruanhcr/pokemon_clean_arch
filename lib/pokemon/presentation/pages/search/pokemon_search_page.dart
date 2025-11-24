@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pokemon_clean_arch/pokemon/domain/entities/pokemon_entity.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/search/pokemon_search_bloc.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/search/pokemon_search_event.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/search/pokemon_search_state.dart';
+import 'package:pokemon_clean_arch/pokemon/presentation/widgets/pokemon_card.dart';
 
 class PokemonSearchPage extends StatefulWidget {
   const PokemonSearchPage({super.key, this.bloc});
@@ -175,7 +175,7 @@ class _PokemonSearchPageState extends State<PokemonSearchPage> {
 
       case PokemonSearchSuccessState(pokemon: var p):
         key = ValueKey(p.id);
-        content = _buildPokemonCard(p);
+        content = PokemonCard(pokemon: p, isFeatured: true,);
         break;
     }
     return SizedBox(key: key, child: content);
@@ -210,116 +210,5 @@ class _PokemonSearchPageState extends State<PokemonSearchPage> {
         ],
       ),
     );
-  }
-
-  Widget _buildPokemonCard(PokemonEntity pokemon) {
-    final color = _getCardColor(pokemon.id);
-
-    return GestureDetector(
-      onTap: () {
-        GoRouter.of(context).push('/pokemon/${pokemon.id}');
-      },
-      child: Container(
-        height: 300,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              color.withAlpha((0.9 * 255).round()),
-              color.withAlpha((0.6 * 255).round()),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: color.withAlpha((0.4 * 255).round()),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Positioned(
-              right: -30,
-              bottom: -30,
-              child: Icon(
-                Icons.catching_pokemon,
-                size: 200,
-                color: Colors.white.withAlpha((0.2 * 255).round()),
-              ),
-            ),
-
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Hero(
-                  tag: pokemon.id,
-                  child: Image.network(
-                    pokemon.imageUrl,
-                    height: 160,
-                    fit: BoxFit.contain,
-                    errorBuilder: (_, _, _) => const Icon(
-                      Icons.image_not_supported,
-                      size: 80,
-                      color: Colors.white54,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  pokemon.name.toUpperCase(),
-                  style: GoogleFonts.pressStart2p(
-                    fontSize: 24,
-                    color: Colors.white,
-                    shadows: [
-                      const Shadow(
-                        offset: Offset(2, 2),
-                        blurRadius: 4,
-                        color: Colors.black26,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black26,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    'ID: #${pokemon.id.toString().padLeft(3, '0')}',
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Color _getCardColor(int id) {
-    final colors = [
-      const Color(0xFF48D0B0),
-      const Color(0xFFFA6555),
-      const Color(0xFF76BCFD),
-      const Color(0xFFFFCE4B),
-      const Color(0xFF9F5BBA),
-      const Color(0xFFCA8179),
-    ];
-    return colors[id % colors.length];
   }
 }

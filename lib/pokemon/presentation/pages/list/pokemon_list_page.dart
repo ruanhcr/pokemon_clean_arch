@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pokemon_clean_arch/pokemon/domain/entities/pokemon_entity.dart';
+import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_bloc.dart';
+import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_state.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/list/pokemon_list_bloc.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/list/pokemon_list_event.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/list/pokemon_list_state.dart';
+import 'package:pokemon_clean_arch/pokemon/presentation/widgets/pokemon_card.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/widgets/pokemon_grid_skeleton.dart';
 
 class PokemonListPage extends StatefulWidget {
@@ -85,6 +87,46 @@ class _PokemonListPageState extends State<PokemonListPage> {
                     onPressed: () => GoRouter.of(context).push('/search'),
                   ),
                 ),
+                BlocBuilder<FavoriteBloc, FavoriteState>(
+                  bloc: GetIt.I.get<FavoriteBloc>(),
+                  builder: (context, state) {
+                    final count = (state is FavoriteLoadedState)
+                        ? state.favorites.length
+                        : 0;
+
+                    return Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.favorite, color: Colors.white),
+                          onPressed: () =>
+                              GoRouter.of(context).push('/favorites'),
+                        ),
+                        if (count > 0)
+                          Positioned(
+                            right: 8,
+                            top: 8,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Colors.redAccent,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Text(
+                                '$count',
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+                const SizedBox(width: 8),
               ],
             ),
 
@@ -124,7 +166,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
                           }
 
                           final pokemon = list[index];
-                          return _buildPokemonCard(context, pokemon);
+                          return PokemonCard(pokemon: pokemon);
                         }, childCount: hasMax ? list.length : list.length + 1),
                       ),
                     ),
@@ -135,108 +177,5 @@ class _PokemonListPageState extends State<PokemonListPage> {
         ),
       ),
     );
-  }
-
-  Widget _buildPokemonCard(BuildContext context, PokemonEntity pokemon) {
-    final color = _getCardColor(pokemon.id);
-
-    return GestureDetector(
-      onTap: () => GoRouter.of(context).push('/pokemon/${pokemon.id}'),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              color.withAlpha((0.8 * 255).round()),
-              color.withAlpha((0.6 * 255).round()),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: color.withAlpha((0.4 * 255).round()),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            Positioned(
-              right: -10,
-              bottom: -10,
-              child: Icon(
-                Icons.catching_pokemon,
-                size: 100,
-                color: Colors.white.withAlpha((0.2 * 255).round()),
-              ),
-            ),
-
-            Positioned(
-              top: 10,
-              right: 10,
-              child: Text(
-                "#${pokemon.id.toString().padLeft(3, '0')}",
-                style: GoogleFonts.poppins(
-                  color: Colors.white.withAlpha((0.6 * 255).round()),
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Hero(
-                  tag: pokemon.id,
-                  child: Image.network(
-                    pokemon.imageUrl,
-                    height: 90,
-                    width: 90,
-                    fit: BoxFit.contain,
-                    errorBuilder: (_, _, _) => const Icon(
-                      Icons.image_not_supported,
-                      color: Colors.white54,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  pokemon.name.toUpperCase(),
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    shadows: [
-                      const Shadow(
-                        offset: Offset(1, 1),
-                        blurRadius: 2,
-                        color: Colors.black26,
-                      ),
-                    ],
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Color _getCardColor(int id) {
-    final colors = [
-      const Color(0xFF48D0B0),
-      const Color(0xFFFA6555),
-      const Color(0xFF76BCFD),
-      const Color(0xFFFFCE4B),
-      const Color(0xFF9F5BBA),
-      const Color(0xFFCA8179),
-    ];
-    return colors[id % colors.length];
   }
 }
