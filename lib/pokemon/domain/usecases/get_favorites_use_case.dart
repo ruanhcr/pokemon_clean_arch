@@ -7,6 +7,7 @@ import 'package:pokemon_clean_arch/pokemon/domain/usecases/i_get_favorites_use_c
 
 @Injectable(as: IGetFavoritesUseCase)
 class GetFavoritesUseCase implements IGetFavoritesUseCase {
+  
   final IPokemonRepository _repository;
   GetFavoritesUseCase({required IPokemonRepository repository})
     : _repository = repository;

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -91,16 +92,17 @@ void main() {
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
 
-    final fontLoader = FontLoader('Poppins');
-    fontLoader.addFont(Future.value(ByteData(0)));
-    await fontLoader.load();
+    final fontNames = ['Poppins', 'Press Start 2P', 'PressStart2P'];
 
-    final fontLoader2 = FontLoader('PressStart2P');
-    fontLoader2.addFont(Future.value(ByteData(0)));
-    await fontLoader2.load();
+    for (final name in fontNames) {
+      final fontLoader = FontLoader(name);
+      fontLoader.addFont(Future.value(ByteData(0)));
+      await fontLoader.load();
+    }
 
     HttpOverrides.global = MockHttpOverrides();
     GoogleFonts.config.allowRuntimeFetching = false;
+
     registerFallbackValue(FakeUri());
     registerFallbackValue(const FetchPokemonDetailEvent(1));
     registerFallbackValue(LoadFavoritesEvent());
@@ -116,6 +118,7 @@ void main() {
     when(() => favoriteBloc.add(any())).thenReturn(null);
     when(() => detailBloc.close()).thenAnswer((_) async {});
     when(() => favoriteBloc.close()).thenAnswer((_) async {});
+    when(() => favoriteBloc.state).thenReturn(FavoriteInitialState());
   });
 
   final tDetail = PokemonDetailEntity(
@@ -185,18 +188,19 @@ void main() {
       () => favoriteBloc.state,
     ).thenReturn(FavoriteLoadedState(favorites: [], favoriteIds: {1}));
 
-    await tester.runAsync(() async {
-      await tester.pumpWidget(
-        MaterialApp(
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: [BlocProvider<FavoriteBloc>.value(value: favoriteBloc)],
+        child: MaterialApp(
           home: PokemonDetailPage(
             id: 1,
             bloc: detailBloc,
             favoriteBloc: favoriteBloc,
           ),
         ),
-      );
-      await tester.pump(const Duration(seconds: 1));
-    });
+      ),
+    );
+    await tester.pump();
 
     expect(find.byIcon(Icons.favorite), findsOneWidget);
     expect(find.byIcon(Icons.favorite_border), findsNothing);
