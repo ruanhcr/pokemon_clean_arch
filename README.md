@@ -7,6 +7,8 @@ Clone o repositório.
 Obtenha as dependências: flutter pub get
 Execute o gerador de código no terminal (na raiz do projeto): dart run build_runner build --delete-conflicting-outputs
 
+![Flutter CI](https://github.com/ruanhcr/pokemon_clean_arch/actions/workflows/flutter_ci.yml/badge.svg)
+
 # Development Roadmap
 - [x] Clean Architecture (Domain, Data, Presentation)
 - [x] Princípios SOLID e SRP (Single Responsibility Principle)
@@ -30,8 +32,6 @@ Execute o gerador de código no terminal (na raiz do projeto): dart run build_ru
 - [x] Detalhes de Pokémon (consumo de API)
 - [x] Adição/Subtração de Pokémon Favorito (Cache local)
 - [x] Lista de Favoritos (Cache local)
-
-![Flutter CI](https://github.com/ruanhcr/pokemon_clean_arch/actions/workflows/flutter_ci.yml/badge.svg)
 
 # Screenshots
 <br>![exemplo](https://i.imgur.com/Z3y7HT9.jpeg)
