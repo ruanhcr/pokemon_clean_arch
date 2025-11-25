@@ -12,15 +12,12 @@ Execute o gerador de código no terminal (na raiz do projeto): dart run build_ru
 
 # Development Roadmap
 - [x] Clean Architecture (Domain, Data, Presentation)
-- [x] Princípios SOLID e SRP (Single Responsibility Principle)
-- [x] BLoC Pattern (Eventos, Estados e Fluxo Unidirecional)
-- [x] Service Locator (GetIt)
-- [x] Code Generation para Injeção de Dependência (Injectable)
 - [x] Repository Pattern e Use Cases
+- [x] Princípios SOLID e SRP (Single Responsibility Principle)
+- [x] BLoC Pattern (Eventos, Estados e Fluxo Unidirecional) [Flutter Bloc](https://pub.dev/packages/flutter_bloc) 
+- [x] Service Locator [get_it](https://pub.dev/packages/get_it)
+- [x] Code Generation para Injeção de Dependência [Injectable](https://pub.dev/packages/injectable)
 - [x] [Flutter/Dart](https://docs.flutter.dev)
-- [x] [Flutter Bloc](https://pub.dev/packages/flutter_bloc) 
-- [x] [get_it](https://pub.dev/packages/get_it)
-- [x] [Injectable](https://pub.dev/packages/injectable)
 - [x] [Go Router](https://pub.dev/packages/go_router)
 - [x] [Dio](https://pub.dev/packages/dio)
 - [x] [Equatable](https://pub.dev/packages/equatable)
