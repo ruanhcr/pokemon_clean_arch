@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:pokemon_clean_arch/core/ui/styles/app_typography.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_bloc.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_state.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/list/pokemon_list_bloc.dart';
@@ -12,8 +12,9 @@ import 'package:pokemon_clean_arch/pokemon/presentation/widgets/pokemon_card.dar
 import 'package:pokemon_clean_arch/pokemon/presentation/widgets/pokemon_grid_skeleton.dart';
 
 class PokemonListPage extends StatefulWidget {
-  const PokemonListPage({super.key, this.bloc});
   final PokemonListBloc? bloc;
+  final AppTypography? typography;
+  const PokemonListPage({super.key, this.bloc, this.typography});
 
   @override
   State<PokemonListPage> createState() => _PokemonListPageState();
@@ -21,12 +22,14 @@ class PokemonListPage extends StatefulWidget {
 
 class _PokemonListPageState extends State<PokemonListPage> {
   late final PokemonListBloc bloc;
+  late final AppTypography typography;
   final _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     bloc = widget.bloc ?? GetIt.I.get<PokemonListBloc>();
+    typography = widget.typography ?? GetIt.I.get<AppTypography>();
     bloc.add(FetchPokemonListEvent());
     _scrollController.addListener(_onScroll);
   }
@@ -68,11 +71,7 @@ class _PokemonListPageState extends State<PokemonListPage> {
                 centerTitle: true,
                 title: Text(
                   'POKÉDEX',
-                  style: GoogleFonts.pressStart2p(
-                    color: Colors.white,
-                    fontSize: 16,
-                    letterSpacing: 2,
-                  ),
+                  style: typography.heading(16, Colors.white),
                 ),
               ),
               actions: [

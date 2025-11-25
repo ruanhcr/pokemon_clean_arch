@@ -5,6 +5,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:pokemon_clean_arch/core/ui/styles/app_typography.dart';
 import 'package:pokemon_clean_arch/pokemon/domain/entities/pokemon_entity.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_bloc.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_event.dart';
@@ -14,6 +15,22 @@ import 'package:pokemon_clean_arch/pokemon/presentation/widgets/pokemon_card.dar
 
 class MockFavoriteBloc extends MockBloc<FavoriteEvent, FavoriteState>
     implements FavoriteBloc {}
+
+class MockAppTypography implements AppTypography {
+  @override
+  TextStyle body(double fontSize, Color color, {FontWeight? fontWeight}) {
+    return TextStyle(fontSize: fontSize, color: color, fontWeight: fontWeight);
+  }
+
+  @override
+  TextStyle heading(double fontSize, Color color) {
+    return TextStyle(
+      fontSize: fontSize,
+      color: color,
+      fontWeight: FontWeight.bold,
+    );
+  }
+}
 
 final _transparentImage = base64Decode(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==',
@@ -61,6 +78,7 @@ class TestHttpOverrides extends HttpOverrides {
 
 void main() {
   late MockFavoriteBloc favoriteBloc;
+  late MockAppTypography typography;
 
   setUpAll(() {
     HttpOverrides.global = TestHttpOverrides();
@@ -69,6 +87,7 @@ void main() {
 
   setUp(() {
     favoriteBloc = MockFavoriteBloc();
+    typography = MockAppTypography();
   });
 
   final tPokemon = PokemonEntity(
@@ -85,7 +104,7 @@ void main() {
     ).thenReturn(const FavoriteLoadedState(favorites: [], favoriteIds: {}));
 
     await tester.pumpWidget(
-      MaterialApp(home: PokemonFavoritesPage(bloc: favoriteBloc)),
+      MaterialApp(home: PokemonFavoritesPage(bloc: favoriteBloc, typography: typography)),
     );
     await tester.pump();
 
@@ -102,7 +121,7 @@ void main() {
 
     await tester.runAsync(() async {
       await tester.pumpWidget(
-        MaterialApp(home: PokemonFavoritesPage(bloc: favoriteBloc)),
+        MaterialApp(home: PokemonFavoritesPage(bloc: favoriteBloc, typography: typography)),
       );
 
       await tester.pump();

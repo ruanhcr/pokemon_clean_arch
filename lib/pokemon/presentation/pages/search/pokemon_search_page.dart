@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:pokemon_clean_arch/core/ui/styles/app_typography.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/search/pokemon_search_bloc.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/search/pokemon_search_event.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/search/pokemon_search_state.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/widgets/pokemon_card.dart';
 
 class PokemonSearchPage extends StatefulWidget {
-  const PokemonSearchPage({super.key, this.bloc});
+  const PokemonSearchPage({super.key, this.bloc, this.typography});
   final PokemonSearchBloc? bloc;
+  final AppTypography? typography;
 
   @override
   State<PokemonSearchPage> createState() => _PokemonSearchPageState();
@@ -19,11 +20,13 @@ class PokemonSearchPage extends StatefulWidget {
 class _PokemonSearchPageState extends State<PokemonSearchPage> {
   final textController = TextEditingController();
   late final PokemonSearchBloc bloc;
+  late final AppTypography typography;
 
   @override
   void initState() {
     super.initState();
     bloc = widget.bloc ?? GetIt.I.get<PokemonSearchBloc>();
+    typography = widget.typography ?? GetIt.I.get<AppTypography>();
   }
 
   @override
@@ -55,11 +58,7 @@ class _PokemonSearchPageState extends State<PokemonSearchPage> {
                 centerTitle: true,
                 title: Text(
                   'PESQUISAR',
-                  style: GoogleFonts.pressStart2p(
-                    color: Colors.white,
-                    fontSize: 16,
-                    letterSpacing: 2,
-                  ),
+                  style: typography.heading(16, Colors.white),
                 ),
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
@@ -74,10 +73,10 @@ class _PokemonSearchPageState extends State<PokemonSearchPage> {
 
                     TextField(
                       controller: textController,
-                      style: GoogleFonts.poppins(color: Colors.white),
+                      style: typography.body(16, Colors.white),
                       decoration: InputDecoration(
                         labelText: 'Nome do Pokémon',
-                        labelStyle: GoogleFonts.poppins(color: Colors.white70),
+                        labelStyle: typography.body(16, Colors.white70),
                         filled: true,
                         fillColor: Colors.white.withAlpha((0.15 * 255).round()),
                         border: OutlineInputBorder(
@@ -204,7 +203,7 @@ class _PokemonSearchPageState extends State<PokemonSearchPage> {
           const SizedBox(height: 16),
           Text(
             message,
-            style: GoogleFonts.poppins(fontSize: 16, color: Colors.white),
+            style: typography.body(16, Colors.white),
             textAlign: TextAlign.center,
           ),
         ],

@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:pokemon_clean_arch/core/ui/styles/app_typography.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_bloc.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_state.dart';
 import 'package:pokemon_clean_arch/pokemon/presentation/widgets/pokemon_card.dart';
 
 class PokemonFavoritesPage extends StatefulWidget {
   final FavoriteBloc? bloc;
-  const PokemonFavoritesPage({super.key, this.bloc});
+  final AppTypography? typography;
+  const PokemonFavoritesPage({super.key, this.bloc, this.typography});
 
   @override
   State<PokemonFavoritesPage> createState() => _PokemonFavoritesPageState();
@@ -17,11 +18,13 @@ class PokemonFavoritesPage extends StatefulWidget {
 
 class _PokemonFavoritesPageState extends State<PokemonFavoritesPage> {
   late final FavoriteBloc bloc;
+  late final AppTypography typography;
 
   @override
   void initState() {
     super.initState();
     bloc = widget.bloc ?? GetIt.I.get<FavoriteBloc>();
+    typography = widget.typography ?? GetIt.I.get<AppTypography>();
   }
 
   @override
@@ -48,10 +51,7 @@ class _PokemonFavoritesPageState extends State<PokemonFavoritesPage> {
               ),
               title: Text(
                 'MEUS FAVORITOS',
-                style: GoogleFonts.pressStart2p(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
+                style: typography.heading(16, Colors.white),
               ),
             ),
 
@@ -71,7 +71,7 @@ class _PokemonFavoritesPageState extends State<PokemonFavoritesPage> {
                         const SizedBox(height: 16),
                         Text(
                           "Nenhum favorito ainda",
-                          style: GoogleFonts.poppins(color: Colors.white70),
+                          style: typography.body(16, Colors.white70),
                         ),
                       ],
                     ),

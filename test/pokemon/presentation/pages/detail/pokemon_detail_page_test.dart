@@ -24,7 +24,6 @@ final _transparentImage = base64Decode(
 
 class FakeStreamListInt extends Fake implements Stream<List<int>> {}
 
-// --- 2. MOCKS DE BLOC ---
 class MockPokemonDetailBloc
     extends MockBloc<PokemonDetailEvent, PokemonDetailState>
     implements PokemonDetailBloc {}
@@ -32,7 +31,6 @@ class MockPokemonDetailBloc
 class MockFavoriteBloc extends MockBloc<FavoriteEvent, FavoriteState>
     implements FavoriteBloc {}
 
-// --- 3. MOCK DE TIPOGRAFIA (Sua implementação correta!) ---
 class MockAppTypography implements AppTypography {
   @override
   TextStyle body(double fontSize, Color color, {FontWeight? fontWeight}) {
@@ -49,7 +47,6 @@ class MockAppTypography implements AppTypography {
   }
 }
 
-// --- 4. MOCKS DE INFRAESTRUTURA HTTP (O Segredo para Image.network) ---
 class MockHttpClient extends Mock implements HttpClient {}
 
 class MockHttpClientRequest extends Mock implements HttpClientRequest {}
@@ -58,7 +55,6 @@ class MockHttpClientResponse extends Mock implements HttpClientResponse {}
 
 class MockHttpHeaders extends Mock implements HttpHeaders {}
 
-// Mixin para Streams (Evita erro de tipo 'Null is not subtype of Stream')
 class StreamMockHttpClientResponse extends Mock
     with Stream<List<int>>
     implements HttpClientResponse {
@@ -84,7 +80,6 @@ class StreamMockHttpClientResponse extends Mock
   }
 }
 
-// O Override que retorna a imagem fake imediatamente
 class MockHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
@@ -98,7 +93,6 @@ class MockHttpOverrides extends HttpOverrides {
       final headers = MockHttpHeaders();
       final uri = invocation.positionalArguments[0] as Uri;
 
-      // Retorna sempre sucesso com a imagem transparente
       final response = StreamMockHttpClientResponse(_transparentImage);
 
       when(() => request.headers).thenReturn(headers);
@@ -148,7 +142,6 @@ void main() {
     when(() => detailBloc.close()).thenAnswer((_) async {});
     when(() => favoriteBloc.close()).thenAnswer((_) async {});
 
-    // Estados iniciais
     when(() => favoriteBloc.state).thenReturn(FavoriteInitialState());
     when(() => detailBloc.state).thenReturn(PokemonDetailInitialState());
   });
@@ -179,13 +172,12 @@ void main() {
             id: 1,
             bloc: detailBloc,
             favoriteBloc: favoriteBloc,
-            typography: typography, // Injeção da sua abstração
+            typography: typography,
           ),
         ),
       ),
     );
 
-    // Pump para processar o microtask da imagem
     await tester.pump();
 
     expect(find.byIcon(Icons.favorite), findsOneWidget);
