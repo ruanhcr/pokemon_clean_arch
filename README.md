@@ -1,13 +1,14 @@
 # Pokémon App
-App que demonstra Clean Architecture no Flutter, consumindo a PokeAPI para exibir dados de Pokémons. O projeto simula a alta exigência de manutenibilidade e rastreabilidade de código necessárias em aplicações de e-commerce, utilizando o padrão BLoC e Injeção de Dependência em tempo de compilação.
+
+![Flutter CI](https://github.com/ruanhcr/pokemon_clean_arch/actions/workflows/flutter_ci.yml/badge.svg)
+
+App que demonstra Clean Architecture no Flutter para mobile multiplataforma (Android & iOS), consumindo a PokeAPI para exibir dados de Pokémons. O projeto simula a alta exigência de manutenibilidade e rastreabilidade de código, utilizando o padrão BLoC, Injeção de Dependência em tempo de compilação e Programação funcional (fpdart).
 
 # Config
 O projeto utiliza Code Generation para o sistema de Injeção de Dependência (injectable). Para a execução correta, é necessário rodar o build_runner.
 Clone o repositório.
 Obtenha as dependências: flutter pub get
 Execute o gerador de código no terminal (na raiz do projeto): dart run build_runner build --delete-conflicting-outputs
-
-![Flutter CI](https://github.com/ruanhcr/pokemon_clean_arch/actions/workflows/flutter_ci.yml/badge.svg)
 
 # Development Roadmap
 - [x] Clean Architecture (Domain, Data, Presentation)
