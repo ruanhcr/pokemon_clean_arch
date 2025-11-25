@@ -1,21 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Import necessário para FontLoader
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:pokemon_clean_arch/main.dart' as app;
+import 'package:pokemon_clean_arch/core/app_widget/app_widget.dart';
+import 'package:pokemon_clean_arch/core/di/injection.dart' as di;
+import 'package:pokemon_clean_arch/core/ui/styles/app_typography.dart';
 
-// --- FALLBACKS ---
 class FakeUri extends Fake implements Uri {}
 class FakeStreamListInt extends Fake implements Stream<List<int>> {}
 
-// --- DADOS MOCKADOS ---
 final _transparentImage = base64Decode(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==',
 );
@@ -44,7 +41,16 @@ final _mockDetailResponse = {
   }
 };
 
-// --- MOCKS DE INFRA ---
+class MockAppTypography implements AppTypography {
+  @override
+  TextStyle body(double fontSize, Color color, {FontWeight? fontWeight}) =>
+      TextStyle(fontSize: fontSize, color: color, fontWeight: fontWeight, fontFamily: 'Roboto');
+
+  @override
+  TextStyle heading(double fontSize, Color color) =>
+      TextStyle(fontSize: fontSize, color: color, fontWeight: FontWeight.bold, fontFamily: 'Roboto');
+}
+
 class MockHttpClient extends Mock implements HttpClient {}
 class MockHttpClientRequest extends Mock implements HttpClientRequest {}
 class MockHttpClientResponse extends Mock implements HttpClientResponse {}
@@ -111,7 +117,6 @@ class IntegrationHttpOverrides extends HttpOverrides {
             : _mockListResponse;
         responseBytes = utf8.encode(jsonEncode(jsonMap));
       } else {
-        // Imagem ou qualquer outra coisa
         statusCode = 200;
         responseBytes = _transparentImage;
       }
@@ -126,7 +131,6 @@ class IntegrationHttpOverrides extends HttpOverrides {
       
       when(() => request.add(any())).thenReturn(null);
       when(() => request.addStream(any())).thenAnswer((_) async {});
-      
       when(() => request.persistentConnection).thenReturn(true);
       when(() => request.persistentConnection = any()).thenReturn(true);
       when(() => request.followRedirects).thenReturn(true);
@@ -143,7 +147,6 @@ class IntegrationHttpOverrides extends HttpOverrides {
       when(() => response.headers).thenReturn(headers);
       when(() => response.cookies).thenReturn([]); 
       when(() => response.compressionState).thenReturn(HttpClientResponseCompressionState.notCompressed);
-      
       when(() => response.isRedirect).thenReturn(false);
       when(() => response.persistentConnection).thenReturn(true);
       when(() => response.redirects).thenReturn([]);
@@ -166,37 +169,26 @@ class IntegrationHttpOverrides extends HttpOverrides {
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  setUpAll(() async {
+  setUpAll(() {
     registerFallbackValue(FakeUri());
     registerFallbackValue(const Duration(seconds: 1));
     registerFallbackValue(FakeStreamListInt());
     
     HttpOverrides.global = IntegrationHttpOverrides();
-
-    // --- A SOLUÇÃO MÁGICA PARA GOOGLE FONTS ---
-    // 1. Dizemos ao pacote: "Não baixe nada da internet"
-    GoogleFonts.config.allowRuntimeFetching = false;
-
-    // 2. Dizemos ao Flutter: "Eu já tenho essas fontes aqui na memória"
-    // (Mesmo que sejam bytes vazios, o Flutter aceita o registro)
-    final loader = FontLoader('PressStart2P');
-    loader.addFont(Future.value(ByteData(0)));
-    await loader.load();
-
-    final loader2 = FontLoader('Poppins'); // Se usar Poppins também
-    loader2.addFont(Future.value(ByteData(0)));
-    await loader2.load();
   });
 
-  setUp(() {
-    try { GetIt.I.reset(); } catch (_) {}
+  setUp(() async {
+    GetIt.I.allowReassignment = true;
   });
 
   testWidgets('E2E: Load List, Scroll and Navigate to Details', (tester) async {
-    app.main();
+    await di.configureDependencies(); 
     
-    await tester.pump(const Duration(seconds: 3)); 
-    await tester.pump();
+    GetIt.I.registerSingleton<AppTypography>(MockAppTypography());
+
+    await tester.pumpWidget(const AppWidget());
+    
+    await tester.pumpAndSettle(const Duration(seconds: 2));
 
     expect(find.text('POKÉDEX'), findsOneWidget);
     
@@ -210,16 +202,12 @@ void main() {
     
     if (find.text('BULBASAUR').evaluate().isNotEmpty) {
         await tester.tap(bulbasaurFinder);
-        
-        await tester.pump(const Duration(seconds: 3));
-        await tester.pump();
+        await tester.pumpAndSettle(const Duration(seconds: 2));
 
         expect(find.text('HP'), findsOneWidget);
         
         await tester.tap(find.byIcon(Icons.arrow_back_ios));
-        
-        await tester.pump(const Duration(seconds: 2));
-        await tester.pump();
+        await tester.pumpAndSettle(const Duration(seconds: 2));
         
         expect(find.text('POKÉDEX'), findsOneWidget);
     }
