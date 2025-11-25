@@ -108,7 +108,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
               Text(
                 pokemon.name.toUpperCase(),
                 style: typography
-                    .heading(36, Colors.white)
+                    .heading(24, Colors.white)
                     .copyWith(fontWeight: FontWeight.bold),
               ),
               Row(
@@ -140,7 +140,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
         ),
 
         Positioned(
-          top: 110,
+          top: 105,
           right: 24,
           child: Text(
             "#${pokemon.id.toString().padLeft(3, '0')}",
@@ -244,7 +244,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
       child: Row(
         children: [
           SizedBox(
-            width: 60,
+            width: 70,
             child: Text(
               label,
               style: const TextStyle(
@@ -264,7 +264,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: LinearProgressIndicator(
-                value: value / 200,
+                value: value / 100,
                 backgroundColor: Colors.grey.shade200,
                 valueColor: AlwaysStoppedAnimation<Color>(color),
                 minHeight: 10,
