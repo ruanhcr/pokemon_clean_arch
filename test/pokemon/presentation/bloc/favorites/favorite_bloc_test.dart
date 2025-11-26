@@ -22,24 +22,27 @@ class MockAppLogger extends Mock implements AppLogger {}
 
 void main() {
   late FavoriteBloc bloc;
-  late MockGetFavoritesUseCase getFavorites;
-  late MockSaveFavoriteUseCase saveFavorite;
-  late MockRemoveFavoriteUseCase removeFavorite;
-  late MockAppLogger logger;
+  late MockGetFavoritesUseCase getFavoritesUseCase;
+  late MockSaveFavoriteUseCase saveFavoriteUseCase;
+  late MockRemoveFavoriteUseCase removeFavoriteUseCase;
+  late MockAppLogger log;
 
   setUp(() {
-    getFavorites = MockGetFavoritesUseCase();
-    saveFavorite = MockSaveFavoriteUseCase();
-    removeFavorite = MockRemoveFavoriteUseCase();
-    logger = MockAppLogger();
+    getFavoritesUseCase = MockGetFavoritesUseCase();
+    saveFavoriteUseCase = MockSaveFavoriteUseCase();
+    removeFavoriteUseCase = MockRemoveFavoriteUseCase();
+    log = MockAppLogger();
 
-    bloc = FavoriteBloc(getFavorites, saveFavorite, removeFavorite, logger);
+    bloc = FavoriteBloc(
+      getFavoritesUseCase: getFavoritesUseCase,
+      saveFavoriteUseCase: saveFavoriteUseCase,
+      removeFavoriteUseCase: removeFavoriteUseCase,
+      log: log,
+    );
   });
 
   setUpAll(() {
-    registerFallbackValue(
-      PokemonEntity(id: 0, name: 'fallback', imageUrl: ''),
-    );
+    registerFallbackValue(PokemonEntity(id: 0, name: 'fallback', imageUrl: ''));
   });
 
   final tPokemon = PokemonEntity(id: 1, name: 'Bulba', imageUrl: 'url');
@@ -48,7 +51,7 @@ void main() {
     blocTest<FavoriteBloc, FavoriteState>(
       'Should emit [Loading, Loaded] when LoadFavoritesEvent is added',
       build: () {
-        when(() => getFavorites()).thenAnswer((_) async => Right([tPokemon]));
+        when(() => getFavoritesUseCase()).thenAnswer((_) async => Right([tPokemon]));
         return bloc;
       },
       act: (bloc) => bloc.add(LoadFavoritesEvent()),
@@ -62,9 +65,9 @@ void main() {
       'Should remove favorite when Toggle is called and item IS favorite',
       build: () {
         when(
-          () => removeFavorite(1),
+          () => removeFavoriteUseCase(1),
         ).thenAnswer((_) async => const Right(null));
-        when(() => getFavorites()).thenAnswer((_) async => const Right([]));
+        when(() => getFavoritesUseCase()).thenAnswer((_) async => const Right([]));
 
         return bloc;
       },
@@ -77,8 +80,8 @@ void main() {
         const FavoriteLoadedState(favorites: [], favoriteIds: {}),
       ],
       verify: (_) {
-        verify(() => removeFavorite(1)).called(1);
-        verifyNever(() => saveFavorite(any()));
+        verify(() => removeFavoriteUseCase(1)).called(1);
+        verifyNever(() => saveFavoriteUseCase(any()));
       },
     );
   });

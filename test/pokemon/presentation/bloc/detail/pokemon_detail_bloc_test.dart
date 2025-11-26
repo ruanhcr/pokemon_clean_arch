@@ -23,7 +23,7 @@ void main() {
   setUp(() {
     useCase = MockPokemonDetailUseCase();
     log = MockAppLogger();
-    bloc = PokemonDetailBloc(useCase, log);
+    bloc = PokemonDetailBloc(getPokemonDetailsUseCase: useCase, log: log);
   });
 
   final tPokemonDetails = PokemonDetailEntity(

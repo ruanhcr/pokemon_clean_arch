@@ -83,7 +83,7 @@ extension GetItInjectableX on _i174.GetIt {
         _i157.PokemonLocalDataSourceImpl(gh<_i979.Box<_i332.PokemonHiveModel>>(
             instanceName: 'favorites_box')));
     gh.factory<_i752.IPokemonRemoteDataSource>(
-        () => _i5.PokemonRemoteDataSourceImpl(gh<_i682.RestClient>()));
+        () => _i5.PokemonRemoteDataSourceImpl(client: gh<_i682.RestClient>()));
     gh.factory<_i886.IPokemonRepository>(() => _i598.PokemonRepositoryImpl(
           gh<_i752.IPokemonRemoteDataSource>(),
           gh<_i234.IPokemonLocalDataSource>(),
@@ -104,23 +104,23 @@ extension GetItInjectableX on _i174.GetIt {
         _i305.SearchPokemonUseCase(repository: gh<_i886.IPokemonRepository>()));
     gh.factory<_i973.ISaveFavoriteUseCase>(() =>
         _i766.SaveFavoriteUseCase(repository: gh<_i886.IPokemonRepository>()));
+    gh.factory<_i594.PokemonSearchBloc>(() => _i594.PokemonSearchBloc(
+          searchPokemonUseCase: gh<_i570.ISearchPokemonUseCase>(),
+          log: gh<_i564.AppLogger>(),
+        ));
     gh.singleton<_i760.FavoriteBloc>(() => _i760.FavoriteBloc(
-          gh<_i46.IGetFavoritesUseCase>(),
-          gh<_i973.ISaveFavoriteUseCase>(),
-          gh<_i743.IRemoveFavoriteUseCase>(),
-          gh<_i564.AppLogger>(),
+          getFavoritesUseCase: gh<_i46.IGetFavoritesUseCase>(),
+          saveFavoriteUseCase: gh<_i973.ISaveFavoriteUseCase>(),
+          removeFavoriteUseCase: gh<_i743.IRemoveFavoriteUseCase>(),
+          log: gh<_i564.AppLogger>(),
         ));
     gh.factory<_i962.PokemonListBloc>(() => _i962.PokemonListBloc(
-          gh<_i1033.IGetPokemonListUseCase>(),
-          gh<_i564.AppLogger>(),
+          getPokemonListUseCase: gh<_i1033.IGetPokemonListUseCase>(),
+          log: gh<_i564.AppLogger>(),
         ));
     gh.factory<_i268.PokemonDetailBloc>(() => _i268.PokemonDetailBloc(
-          gh<_i303.IGetPokemonDetailsUseCase>(),
-          gh<_i564.AppLogger>(),
-        ));
-    gh.factory<_i594.PokemonSearchBloc>(() => _i594.PokemonSearchBloc(
-          gh<_i570.ISearchPokemonUseCase>(),
-          gh<_i564.AppLogger>(),
+          getPokemonDetailsUseCase: gh<_i303.IGetPokemonDetailsUseCase>(),
+          log: gh<_i564.AppLogger>(),
         ));
     return this;
   }

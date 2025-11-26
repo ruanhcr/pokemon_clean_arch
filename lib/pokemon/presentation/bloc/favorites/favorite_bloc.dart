@@ -9,17 +9,21 @@ import 'package:pokemon_clean_arch/pokemon/presentation/bloc/favorites/favorite_
 
 @singleton
 class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
-  final IGetFavoritesUseCase getFavoritesUseCase;
-  final ISaveFavoriteUseCase saveFavoriteUseCase;
-  final IRemoveFavoriteUseCase removeFavoriteUseCase;
-  final AppLogger logger;
+  final IGetFavoritesUseCase _getFavoritesUseCase;
+  final ISaveFavoriteUseCase _saveFavoriteUseCase;
+  final IRemoveFavoriteUseCase _removeFavoriteUseCase;
+  final AppLogger _log;
 
-  FavoriteBloc(
-    this.getFavoritesUseCase,
-    this.saveFavoriteUseCase,
-    this.removeFavoriteUseCase,
-    this.logger,
-  ) : super(FavoriteInitialState()) {
+  FavoriteBloc({
+    required IGetFavoritesUseCase getFavoritesUseCase,
+    required ISaveFavoriteUseCase saveFavoriteUseCase,
+    required IRemoveFavoriteUseCase removeFavoriteUseCase,
+    required AppLogger log,
+  }) : _getFavoritesUseCase = getFavoritesUseCase,
+       _saveFavoriteUseCase = saveFavoriteUseCase,
+       _removeFavoriteUseCase = removeFavoriteUseCase,
+       _log = log,
+       super(FavoriteInitialState()) {
     on<LoadFavoritesEvent>(_onLoadFavorites);
     on<ToggleFavoriteEvent>(_onToggleFavorite);
   }
@@ -30,11 +34,11 @@ class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
   ) async {
     emit(FavoriteLoadingState());
 
-    final result = await getFavoritesUseCase();
+    final result = await _getFavoritesUseCase();
 
     result.fold(
       (failure) {
-        logger.error('Erro ao carregar favoritos', failure);
+        _log.error('Erro ao carregar favoritos', failure);
         emit(const FavoriteErrorState("Erro ao carregar favoritos."));
       },
       (favorites) {
@@ -49,17 +53,17 @@ class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
     Emitter<FavoriteState> emit,
   ) async {
     if (state is! FavoriteLoadedState) return;
-    
+
     final currentState = state as FavoriteLoadedState;
     final isFav = currentState.isFavorite(event.pokemon.id);
 
     final result = isFav
-        ? await removeFavoriteUseCase(event.pokemon.id)
-        : await saveFavoriteUseCase(event.pokemon);
+        ? await _removeFavoriteUseCase(event.pokemon.id)
+        : await _saveFavoriteUseCase(event.pokemon);
 
     await result.fold(
       (failure) async {
-        logger.error('Erro ao alterar favorito', failure);
+        _log.error('Erro ao alterar favorito', failure);
       },
       (_) async {
         add(LoadFavoritesEvent());

@@ -12,17 +12,22 @@ import 'package:stream_transform/stream_transform.dart';
 
 @injectable
 class PokemonListBloc extends Bloc<PokemonListEvent, PokemonListState> {
-  final IGetPokemonListUseCase useCase;
-  final AppLogger log;
+  final IGetPokemonListUseCase _getPokemonListUseCase;
+  final AppLogger _log;
 
-  PokemonListBloc(this.useCase, this.log) : super(PokemonListInitialState()) {
+  PokemonListBloc({
+    required IGetPokemonListUseCase getPokemonListUseCase,
+    required AppLogger log,
+  }) : _getPokemonListUseCase = getPokemonListUseCase,
+       _log = log,
+       super(PokemonListInitialState()) {
     on<FetchPokemonListEvent>(
       _onFetchPokemonList,
       transformer: throttleDroppable(const Duration(milliseconds: 100)),
     );
   }
 
-Future<void> _onFetchPokemonList(
+  Future<void> _onFetchPokemonList(
     FetchPokemonListEvent event,
     Emitter<PokemonListState> emit,
   ) async {
@@ -31,7 +36,7 @@ Future<void> _onFetchPokemonList(
     _emitLoadingIfInitial(state, emit);
     final offset = _calculateCurrentOffset(state);
 
-    final result = await useCase(offset: offset);
+    final result = await _getPokemonListUseCase(offset: offset);
 
     result.fold(
       (failure) => _handleFailure(failure, emit),
@@ -43,7 +48,10 @@ Future<void> _onFetchPokemonList(
     return state is PokemonListSuccessState && state.hasReachedMax;
   }
 
-  void _emitLoadingIfInitial(PokemonListState state, Emitter<PokemonListState> emit) {
+  void _emitLoadingIfInitial(
+    PokemonListState state,
+    Emitter<PokemonListState> emit,
+  ) {
     if (state is PokemonListInitialState) {
       emit(PokemonListLoadingState());
     }
@@ -57,7 +65,7 @@ Future<void> _onFetchPokemonList(
   }
 
   void _handleFailure(Failure failure, Emitter<PokemonListState> emit) {
-    log.error('Erro na lista', failure);
+    _log.error('Erro na lista', failure);
     emit(PokemonListErrorState(failure.uiMessage));
   }
 
@@ -74,12 +82,15 @@ Future<void> _onFetchPokemonList(
     _handleNewData(currentState, newPokemons, emit);
   }
 
-  void _handleEmptyResult(PokemonListState currentState, Emitter<PokemonListState> emit) {
+  void _handleEmptyResult(
+    PokemonListState currentState,
+    Emitter<PokemonListState> emit,
+  ) {
     if (currentState is PokemonListSuccessState) {
       emit(currentState.copyWith(hasReachedMax: true));
       return;
     }
-    
+
     emit(const PokemonListSuccessState(pokemons: []));
   }
 
@@ -88,8 +99,8 @@ Future<void> _onFetchPokemonList(
     List<PokemonEntity> newPokemons,
     Emitter<PokemonListState> emit,
   ) {
-    final currentList = currentState is PokemonListSuccessState 
-        ? currentState.pokemons 
+    final currentList = currentState is PokemonListSuccessState
+        ? currentState.pokemons
         : <PokemonEntity>[];
 
     emit(

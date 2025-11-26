@@ -8,10 +8,15 @@ import 'package:pokemon_clean_arch/pokemon/presentation/bloc/detail/pokemon_deta
 
 @injectable
 class PokemonDetailBloc extends Bloc<PokemonDetailEvent, PokemonDetailState> {
-  final IGetPokemonDetailsUseCase useCase;
-  final AppLogger log;
+  final IGetPokemonDetailsUseCase _getPokemonDetailsUseCase;
+  final AppLogger _log;
 
-  PokemonDetailBloc(this.useCase, this.log) : super(PokemonDetailInitialState()) {
+  PokemonDetailBloc({
+    required IGetPokemonDetailsUseCase getPokemonDetailsUseCase,
+    required AppLogger log,
+  }) : _getPokemonDetailsUseCase = getPokemonDetailsUseCase,
+       _log = log,
+       super(PokemonDetailInitialState()) {
     on<FetchPokemonDetailEvent>(_onFetchPokemonDetail);
   }
 
@@ -21,12 +26,12 @@ class PokemonDetailBloc extends Bloc<PokemonDetailEvent, PokemonDetailState> {
   ) async {
     emit(PokemonDetailLoadingState());
 
-    final result = await useCase.call(event.id);
+    final result = await _getPokemonDetailsUseCase(event.id);
 
     result.fold(
       (failure) {
         final message = failure.uiMessage;
-        log.error('Erro nos detalhes', failure);
+        _log.error('Erro nos detalhes', failure);
         emit(PokemonDetailErrorState(message));
       },
       (pokemon) {

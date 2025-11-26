@@ -10,11 +10,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 @injectable
 class PokemonSearchBloc extends Bloc<PokemonSearchEvent, PokemonSearchState> {
-  final ISearchPokemonUseCase getPokemonUseCase;
-  final AppLogger log;
+  final ISearchPokemonUseCase _searchPokemonUseCase;
+  final AppLogger _log;
 
-  PokemonSearchBloc(this.getPokemonUseCase, this.log)
-    : super(PokemonSearchInitialState()) {
+  PokemonSearchBloc({
+    required ISearchPokemonUseCase searchPokemonUseCase,
+    required AppLogger log,
+  }) : _searchPokemonUseCase = searchPokemonUseCase,
+       _log = log,
+       super(PokemonSearchInitialState()) {
     on<SearchPokemonEvent>(
       _onSearch,
       transformer: debounceRestartable(const Duration(milliseconds: 500)),
@@ -32,12 +36,12 @@ class PokemonSearchBloc extends Bloc<PokemonSearchEvent, PokemonSearchState> {
       return;
     }
     emit(PokemonSearchLoadingState());
-    final result = await getPokemonUseCase(event.query);
+    final result = await _searchPokemonUseCase(event.query);
 
     result.fold(
       (failure) {
         final message = failure.uiMessage;
-        log.error('Erro na busca', failure);
+        _log.error('Erro na busca', failure);
         emit(PokemonSearchErrorState(message));
       },
       (pokemon) {

@@ -9,6 +9,7 @@ import 'i_get_pokemon_details_use_case.dart';
 @Injectable(as: IGetPokemonDetailsUseCase)
 class GetPokemonDetailsUseCase implements IGetPokemonDetailsUseCase {
   final IPokemonRepository _repository;
+  
   GetPokemonDetailsUseCase({required IPokemonRepository repository})
     : _repository = repository;
 

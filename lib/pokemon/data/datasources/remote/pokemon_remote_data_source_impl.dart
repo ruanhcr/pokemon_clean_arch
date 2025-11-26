@@ -5,19 +5,19 @@ import 'package:pokemon_clean_arch/pokemon/data/datasources/remote/i_pokemon_rem
 
 @Injectable(as: IPokemonRemoteDataSource)
 class PokemonRemoteDataSourceImpl implements IPokemonRemoteDataSource {
-  final RestClient client;
+  final RestClient _client;
 
-  PokemonRemoteDataSourceImpl(this.client);
+  PokemonRemoteDataSourceImpl({required RestClient client}) : _client = client;
 
   @override
   Future<Map<String, dynamic>> searchPokemon(String name) async {
-    final response = await client.get('${Endpoints.pokemon}/$name');
+    final response = await _client.get('${Endpoints.pokemon}/$name');
     return response.data;
   }
 
   @override
   Future<Map<String, dynamic>> getPokemonDetailById(int id) async {
-    final response = await client.get('${Endpoints.pokemon}/$id');
+    final response = await _client.get('${Endpoints.pokemon}/$id');
     return response.data;
   }
 
@@ -26,7 +26,7 @@ class PokemonRemoteDataSourceImpl implements IPokemonRemoteDataSource {
     int offset = 0,
     int limit = 20,
   }) async {
-    final response = await client.get(
+    final response = await _client.get(
       Endpoints.pokemon,
       queryParameters: {'offset': offset, 'limit': limit},
     );

@@ -17,13 +17,13 @@ class MockAppLogger extends Mock implements AppLogger {}
 
 void main() {
   late PokemonListBloc bloc;
-  late MockGetPokemonListUseCase useCase;
+  late MockGetPokemonListUseCase getPokemonListUseCase;
   late MockAppLogger log;
 
   setUp(() {
-    useCase = MockGetPokemonListUseCase();
+    getPokemonListUseCase = MockGetPokemonListUseCase();
     log = MockAppLogger();
-    bloc = PokemonListBloc(useCase, log);
+    bloc = PokemonListBloc(getPokemonListUseCase: getPokemonListUseCase, log: log);
   });
 
   final tPokemonList = [
@@ -39,7 +39,7 @@ group('PokemonListBloc', () {
     blocTest<PokemonListBloc, PokemonListState>(
       'Should emit [Loading, Success] when UseCase returns Right(data)',
       build: () {
-        when(() => useCase(offset: 0))
+        when(() => getPokemonListUseCase(offset: 0))
             .thenAnswer((_) async => Right(tPokemonList));
         return bloc;
       },
@@ -53,7 +53,7 @@ group('PokemonListBloc', () {
     blocTest<PokemonListBloc, PokemonListState>(
       'Should emit [Loading, Error] and Log when UseCase returns Left(failure)',
       build: () {
-        when(() => useCase(offset: 0))
+        when(() => getPokemonListUseCase(offset: 0))
             .thenAnswer((_) async => Left(ServerFailure('Erro 500')));
         return bloc;
       },
@@ -70,7 +70,7 @@ group('PokemonListBloc', () {
     blocTest<PokemonListBloc, PokemonListState>(
       'Should concatenate list when loading second page with Success',
       build: () {
-        when(() => useCase(offset: 1))
+        when(() => getPokemonListUseCase(offset: 1))
             .thenAnswer((_) async => Right([pokemon2]));
         return bloc;
       },

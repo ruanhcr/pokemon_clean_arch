@@ -13,7 +13,7 @@ void main() {
 
   setUp(() {
     client = MockRestClient();
-    dataSource = PokemonRemoteDataSourceImpl(client);
+    dataSource = PokemonRemoteDataSourceImpl(client: client);
   });
 
   final tJsonList = {
