@@ -23,6 +23,7 @@ Execute o gerador de código no terminal (na raiz do projeto): dart run build_ru
 - [x] [Equatable](https://pub.dev/packages/equatable)
 - [x] [fpdart](https://pub.dev/packages/fpdart)
 - [x] [Hive](https://pub.dev/packages/hive)
+- [x] BLoC Concurrency (Throttle & Droppable para Paginação) [bloc_concurrency](https://pub.dev/packages/bloc_concurrency)
 - [x] Testes unitários, testes de widget e testes de integração
 - [x] DevOps: CI/CD com GitHub Actions
 
