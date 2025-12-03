@@ -38,6 +38,8 @@ final _transparentImage = base64Decode(
 
 class MockHttpClient extends Mock implements HttpClient {}
 
+class FakeUri extends Fake implements Uri {}
+
 class MockHttpClientRequest extends Mock implements HttpClientRequest {}
 
 class MockHttpClientResponse extends Mock implements HttpClientResponse {}
@@ -83,6 +85,7 @@ void main() {
   setUpAll(() {
     HttpOverrides.global = TestHttpOverrides();
     registerFallbackValue(LoadFavoritesEvent());
+    registerFallbackValue(FakeUri());
   });
 
   setUp(() {
