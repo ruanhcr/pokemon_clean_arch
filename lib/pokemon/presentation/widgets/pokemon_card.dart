@@ -93,7 +93,7 @@ class PokemonCard extends StatelessWidget {
                       height: isFeatured ? 110 : (showFavoriteButton ? 80 : 90),
                       width: isFeatured ? 110 : (showFavoriteButton ? 80 : 90),
                       fit: BoxFit.contain,
-                      errorBuilder: (_, _, _) => const Icon(
+                      errorBuilder: (_, __, ___) => const Icon(
                         Icons.image_not_supported,
                         color: Colors.white54,
                       ),
